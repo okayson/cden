@@ -4,6 +4,7 @@
 
 * cdの効率化
 	* 移動履歴を表示->選択して移動可能とする
+	* `.`を入力したら、カレントディレクトリ以下を表示->選択して移動可能とする
 
 * 移動履歴の管理
 	* cdの都度、移動先+移動回数を記録する
@@ -20,4 +21,26 @@
 
 * 絶対パスで記録する
 * symbolic linkはそのまま記録する
+
+## Name candidate
+* acceleratedcd
+* accelcd
+* accd
+
+## Note
+```shell
+function ac(){
+	# $1 : empty	=> 履歴から候補を表示
+	#	 : .		=> CurrentDirから候補を表示
+	#	 : <dir>	=> 何もしない
+	dir = accd.py $1
+	if [ -n "$1" ]; then
+		accd.py
+	elif
+		accd.py $1
+	else
+		cd $1
+	fi
+}
+```
 
