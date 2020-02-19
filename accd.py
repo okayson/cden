@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-
+import subprocess
 
 # ----------------------------------------
 class Candidates():
@@ -9,7 +9,6 @@ class Candidates():
         if directory == '':
             history = CDHistory()
             results = history.query()
-            test(history) # FIXME
         elif directory == '.':
             follower = CDFollower()
             results = follower.query()
@@ -33,17 +32,16 @@ class CDHistory():
     def load(self):
         try:
             with open('./.accd_history','rt') as fin:
-                # FIXME: 改行がうざい
-                self.__directories = [directory[:-1] for directory in fin.readline()]
-                # self.__directories = [directory[] for directory in fin.readline()]
+                self.__directories = [directory.rstrip() for directory in fin]
         except IOError:
             pass
 
     def store(self):
-        with open('./.accd_history','at') as fout:
-            for directory in self.__directories:
-                # print(directory, file=fout)
-                fout.write(directory+'\n')
+        pass
+        # with open('./.accd_history','at') as fout:
+        #     for directory in self.__directories:
+        #         # print(directory, file=fout)
+        #         fout.write(directory+'\n')
 
     def __str__(self):
         return str(self.__directories)
@@ -54,7 +52,9 @@ class CDFollower():
         self.__depth = depth
 
     def query(self):
-        return []
+        directories = subprocess.getoutput("find ./ -path '*/\.*' -name .git -prune -o -type d -print 2> /dev/null")
+
+        return directories.split('\n')
 
     def register(self, directory):
         pass
@@ -64,23 +64,20 @@ class CDFollower():
 
 # ----------------------------------------
 def main():
-    directory = ''
+    arg = ''
     if len(sys.argv) != 1:
-        directory = sys.argv[1]
+        arg = sys.argv[1]
 
     candidates = Candidates()
-    candidate = candidates.query(directory)
+    directories = candidates.query(arg)
     # TBD: fuzzy-find, cd, register
-    print(candidate)
+    for directory in directories:
+        print(directory)
+    # ret = subprocess.getstatusoutput(['fzf',candidate])
+    # ret = subprocess.getstatusoutput('ls | fzf')
+    # print(ret)
 
-def test(history):
-    history.register('/root/hoge')
-    history.register('/root/sample/hoge')
-    history.store()
-    # for h in history.query():
-    #     print(h)
-    
-    
+# ----------------------------------------
 if __name__ == "__main__":
 
     main()
